@@ -1,7 +1,7 @@
 const db = require("../models");
 const router = require("express").Router();
 const path = require("path");
-
+const mongoose = require("mongoose");
 
 
 module.exports = (app) => {
@@ -14,17 +14,31 @@ module.exports = (app) => {
         .catch(err =>{
             res.status(401).json(err);
         })
-        // /
-router.get("/exercise", (req, res) => {
-res.sendFile(path.join(__dirname, "../public/exercise.html"));
-});
 
-router.get("/stats", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/stats.html"));
     });
 
-module.exports = router;
-    })
+    app.post("/api/workouts", (req,res)=>{
+        db.Workout.create(req.body)
+        .then(dbWorkout => {
+            res.json(dbWorkout);
+        })
+        .catch(err =>{
+            res.status(401).json(err);
+        });
+    });
+
+    app.put("/api/workouts/:id", (req, res)=>{
+        console.log(req.body);
+        db.Workout.update({_id: new mongoose.Types.ObjectId(req.params.id)}, 
+        {$push :{exercises: req.body}})
+        .then(dbWorkout => {
+            res.json(dbWorkout);
+        })
+        .catch(err =>{
+            res.status(401).json(err);
+        });
+        
+    });
 };
 
 
